@@ -28,7 +28,7 @@ public class IssueRestController {
     }
 
     @GetMapping("/all")
-    public Flux<Issue> GetIssue() {
+    public Flux<Issue> getIssue() {
         return issueService.findAllIssue();
     }
 
@@ -38,12 +38,12 @@ public class IssueRestController {
     }
 
     @GetMapping("/active")
-    public Flux<Issue> GetActiveIssue() {
+    public Flux<Issue> getActiveIssue() {
         return issueService.findStatus("A");
     }
 
     @GetMapping("/inactive")
-    public Flux<Issue> GetInactiveIssue() {
+    public Flux<Issue> getInactiveIssue() {
         return issueService.findStatus("I");
     }
 
