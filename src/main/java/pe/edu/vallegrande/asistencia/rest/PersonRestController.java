@@ -28,7 +28,7 @@ public class PersonRestController {
     }
 
     @GetMapping("/all")
-    public Flux<Person> GetPerson() {
+    public Flux<Person> getPerson() {
         return personService.findAllPerson();
     }
 
@@ -38,12 +38,12 @@ public class PersonRestController {
     }
 
     @GetMapping("/active")
-    public Flux<Person> GetActivePerson() {
+    public Flux<Person> getActivePerson() {
         return personService.findStatus("A");
     }
 
     @GetMapping("/inactive")
-    public Flux<Person> GetInactivePerson() {
+    public Flux<Person> getInactivePerson() {
         return personService.findStatus("I");
     }
 
