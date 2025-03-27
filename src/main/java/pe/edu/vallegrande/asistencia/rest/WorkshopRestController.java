@@ -29,7 +29,7 @@ public class WorkshopRestController {
     }
 
     @GetMapping("/lis")
-    public Flux<Workshop> GetWorkshop() {
+    public Flux<Workshop> getWorkshop() {
         return workshopService.findAllWorkshop();
     }
 
@@ -39,12 +39,12 @@ public class WorkshopRestController {
     }
 
     @GetMapping("/active")
-    public Flux<Workshop> GetActiveWorkshop() {
+    public Flux<Workshop> getActiveWorkshop() {
         return workshopService.findStatus("A");
     }
 
     @GetMapping("/inactive")
-    public Flux<Workshop> GetInactiveWorkshop() {
+    public Flux<Workshop> getInactiveWorkshop() {
         return workshopService.findStatus("I");
     }
 
