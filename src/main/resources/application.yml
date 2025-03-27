@@ -1,0 +1,5 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://ep-odd-breeze-a5n2pfaw-pooler.us-east-2.aws.neon.tech:5432/Asistencia?sslmode=require
+    username: Asistencia_owner
+    password: JlUOQqrK4Ei2
