@@ -92,4 +92,8 @@ class KafkaConsumerServiceTest {
 
         when(objectMapper.readValue("invalid-json", WorkshopKafkaEventDto.class)).thenThrow(new RuntimeException("Invalid JSON"));
 
-        kafkaConsumerService.consumeWorkshopEvent(r
+        kafkaConsumerService.consumeWorkshopEvent(record);
+
+        verifyNoInteractions(workshopRepository);
+    }
+}
