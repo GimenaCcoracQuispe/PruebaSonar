@@ -1,0 +1,15 @@
+pe/edu/vallegrande/issue/model/Workshop.class
+pe/edu/vallegrande/issue/service/kafkaProducerService.class
+pe/edu/vallegrande/issue/IssueApplication.class
+pe/edu/vallegrande/issue/repository/IssueRepository.class
+pe/edu/vallegrande/issue/service/KafkaConsumerService.class
+pe/edu/vallegrande/issue/config/SecurityConfig.class
+pe/edu/vallegrande/issue/config/AuthContextWebFilter.class
+pe/edu/vallegrande/issue/repository/WorkshopRepository.class
+pe/edu/vallegrande/issue/controller/IssueController.class
+pe/edu/vallegrande/issue/model/Workshop$WorkshopBuilder.class
+pe/edu/vallegrande/issue/config/CustomAuthenticationToken.class
+pe/edu/vallegrande/issue/model/Issue.class
+pe/edu/vallegrande/issue/dto/IssueKafkaEventDto.class
+pe/edu/vallegrande/issue/dto/WorkshopKafkaEventDto.class
+pe/edu/vallegrande/issue/service/IssueService.class

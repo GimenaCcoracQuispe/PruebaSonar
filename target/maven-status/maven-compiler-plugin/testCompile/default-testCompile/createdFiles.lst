@@ -1,0 +1,5 @@
+pe/edu/vallegrande/issue/IssueApplicationTests.class
+pe/edu/vallegrande/issue/service/IssueServiceTest.class
+pe/edu/vallegrande/issue/controller/IssueControllerTest.class
+pe/edu/vallegrande/issue/config/DotenvInitializer.class
+pe/edu/vallegrande/issue/config/TestSecurityConfig.class

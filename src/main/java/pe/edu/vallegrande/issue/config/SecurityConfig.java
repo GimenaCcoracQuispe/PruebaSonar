@@ -2,6 +2,7 @@ package pe.edu.vallegrande.issue.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -23,6 +24,7 @@ import java.util.List;
  * - Requiere JWT con roles USER/ADMIN para acceder a las rutas protegidas
  * - Configura CORS para permitir acceso desde el frontend
  */
+@Profile("!test") // ✅ para que NO se cargue en tests
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -83,13 +85,13 @@ public class SecurityConfig {
                 return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
         }
 
-        protected Mono<CustomAuthenticationToken> convertJwt(Jwt jwt) {
-    String role = jwt.getClaimAsString("role");
-    Collection<GrantedAuthority> authorities = role != null
-        ? List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
-        : List.of();
-    return Mono.just(new CustomAuthenticationToken(jwt, authorities));
-}
+        private Mono<CustomAuthenticationToken> convertJwt(Jwt jwt) {
+                String role = jwt.getClaimAsString("role");
+                Collection<GrantedAuthority> authorities = role != null
+                                ? List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                                : List.of();
+                return Mono.just(new CustomAuthenticationToken(jwt, authorities));
+        }
 
 
 }
