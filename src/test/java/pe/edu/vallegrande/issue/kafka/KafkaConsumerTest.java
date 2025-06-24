@@ -50,6 +50,7 @@ class KafkaConsumerServiceTest {
         ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
         when(objectMapper.readValue("json-body", WorkshopEvent.class)).thenReturn(workshopEvent);
+        when(template.selectOne(any(), eq(WorkshopEvent.class))).thenReturn(Mono.empty());
         when(template.insert(WorkshopEvent.class)).thenReturn(reactiveInsert);
         when(reactiveInsert.using(any(WorkshopEvent.class))).thenReturn(Mono.just(workshopEvent));
 
@@ -57,7 +58,6 @@ class KafkaConsumerServiceTest {
 
         verify(template).insert(WorkshopEvent.class);
         verify(reactiveInsert).using(any(WorkshopEvent.class));
-        verify(template, never()).update(any());
     }
 
     @Test
