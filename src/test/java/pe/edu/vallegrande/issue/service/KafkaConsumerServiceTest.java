@@ -48,13 +48,15 @@ class KafkaConsumerServiceTest {
         dto.setEndDate(LocalDate.of(2025, 1, 30));
         dto.setState("A");
 
-        workshop = new Workshop();
-        workshop.setId(dto.getId());
-        workshop.setName(dto.getName());
-        workshop.setDescription(dto.getDescription());
-        workshop.setStartDate(dto.getStartDate());
-        workshop.setEndDate(dto.getEndDate());
-        workshop.setState(dto.getState());
+        workshop = new Workshop(
+    dto.getId(),
+    dto.getName(),
+    dto.getDescription(),
+    dto.getStartDate(),
+    dto.getEndDate(),
+    dto.getState()
+);
+
     }
 
     @Test
