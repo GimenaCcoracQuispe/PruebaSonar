@@ -62,7 +62,6 @@ public class SecurityConfig {
                                                 .pathMatchers(HttpMethod.DELETE, "/tema/delete/**")
                                                 .hasRole("ADMIN")
 
-                                                // Todo lo demás requiere estar autenticado
                                                 .anyExchange().authenticated())
                                 .oauth2ResourceServer(oauth2 -> oauth2
                                                 .jwt(jwt -> jwt
