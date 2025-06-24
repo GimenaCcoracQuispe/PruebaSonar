@@ -1,98 +1,101 @@
 package pe.edu.vallegrande.issue.controller;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import pe.edu.vallegrande.issue.model.Issue;
 import pe.edu.vallegrande.issue.service.IssueService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RestController
-@RequestMapping("/tema")
-@Slf4j
-@CrossOrigin(origins = "*")
-public class IssueController {
-    private final IssueService issueService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+public class IssueControllerTest {
+    @Mock
+    private IssueService issueService;
 
-    public IssueController(IssueService issueService) {
-        this.issueService = issueService;
+    private WebTestClient webTestClient;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        IssueController controller = new IssueController(issueService);
+        webTestClient = WebTestClient.bindToController(controller).build();
     }
 
-    @GetMapping("/all")
-    public Flux<Issue> getIssue() {
-        return issueService.findAllIssue();
+    private Issue sampleIssue() {
+        Issue issue = new Issue();
+        issue.setId(1L);
+        issue.setName("Tema 1");
+        issue.setWorkshopId(Integer.valueOf("1")); 
+        issue.setState("A");
+        return issue;
     }
 
-    @GetMapping("/{id}")  
-    public Mono<Issue> getIssueById(@PathVariable Long id) {
-        return issueService.findById(id);
+    @Test
+    void testGetAllIssues() {
+        Issue issue = sampleIssue();
+        when(issueService.findAllIssue()).thenReturn(Flux.just(issue));
+
+        webTestClient.get()
+                .uri("/tema/all")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(Issue.class).hasSize(1);
     }
 
-    @GetMapping("/active")
-    public Flux<Issue> getActiveIssue() {
-        return issueService.findStatus("A");
+    @Test
+    void testGetIssueById() {
+        Issue issue = sampleIssue();
+        when(issueService.findById(1L)).thenReturn(Mono.just(issue));
+
+        webTestClient.get()
+                .uri("/tema/1")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Issue.class)
+                .isEqualTo(issue);
     }
 
-    @GetMapping("/inactive")
-    public Flux<Issue> getInactiveIssue() {
-        return issueService.findStatus("I");
+    @Test
+    void testCreateIssue() {
+        Issue issue = sampleIssue();
+        when(issueService.createIssue(any(Issue.class))).thenReturn(Mono.just(issue));
+
+        webTestClient.post()
+                .uri("/tema/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(issue)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Issue.class)
+                .isEqualTo(issue);
     }
 
-    @PostMapping("/create")
-    public Mono<Issue> createIssue(@RequestBody Issue issue) {
-        return issueService.createIssue(issue);
+    @Test
+    void testActivateIssue() {
+        Issue issue = sampleIssue();
+        issue.setState("I");
+
+        when(issueService.findById(1L)).thenReturn(Mono.just(issue));
+        when(issueService.save(any())).thenReturn(Mono.just(issue));
+
+        webTestClient.put()
+                .uri("/tema/activate/1")
+                .exchange()
+                .expectStatus().isOk();
     }
 
-    @PutMapping("/update/{id}")
-    public Mono<ResponseEntity<Issue>> updateIssue(@PathVariable Long id, @RequestBody Issue updatedIssue) {
-        return issueService.findById(id)
-                .flatMap(existingIssue -> {
-                    existingIssue.setName(updatedIssue.getName());
-                    existingIssue.setWorkshopId(updatedIssue.getWorkshopId());
-                    existingIssue.setScheduledTime(updatedIssue.getScheduledTime());
-                    existingIssue.setObservation(updatedIssue.getObservation());
-                    if (updatedIssue.getState() != null) {
-                        existingIssue.setState(updatedIssue.getState());
-                    }
-                    return issueService.save(existingIssue);
-                })
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
+    @Test
+    void testDeleteIssue() {
+        when(issueService.deleteById(1L)).thenReturn(Mono.empty());
 
-    @PutMapping("/activate/{id}")
-    public Mono<ResponseEntity<Void>> activateIssue(@PathVariable Long id) {
-        return issueService.findById(id)
-                .flatMap(existingIssue -> {
-                    existingIssue.setState("A"); 
-                    return issueService.save(existingIssue).then(Mono.just(ResponseEntity.ok().<Void>build()));
-                })
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/deactivate/{id}")
-    public Mono<ResponseEntity<Void>> deactivateIssue(@PathVariable Long id) {
-        return issueService.findById(id)
-                .flatMap(existingIssue -> {
-                    existingIssue.setState("I"); 
-                    return issueService.save(existingIssue).then(Mono.just(ResponseEntity.ok().<Void>build()));
-                })
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public Mono<ResponseEntity<Void>> deleteIssue(@PathVariable Long id) {
-        return issueService.deleteById(id)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        webTestClient.delete()
+                .uri("/tema/delete/1")
+                .exchange()
+                .expectStatus().isOk();
     }
 }
