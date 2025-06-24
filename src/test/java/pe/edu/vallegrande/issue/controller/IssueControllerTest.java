@@ -31,7 +31,7 @@ class IssueControllerTest {
     @MockBean
     private IssueService issueService;
 
-    private Issue sampleIssue;
+    private Issue issue;
 
     @BeforeEach
     void setUp() {
