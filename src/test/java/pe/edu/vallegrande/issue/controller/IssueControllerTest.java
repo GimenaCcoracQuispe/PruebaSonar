@@ -98,4 +98,90 @@ public class IssueControllerTest {
                 .exchange()
                 .expectStatus().isOk();
     }
+
+    @Test
+void testGetActiveIssues() {
+    Issue issue = sampleIssue();
+    when(issueService.findStatus("A")).thenReturn(Flux.just(issue));
+
+    webTestClient.get()
+            .uri("/tema/active")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(Issue.class)
+            .hasSize(1);
+}
+
+@Test
+void testGetInactiveIssues() {
+    Issue issue = sampleIssue();
+    issue.setState("I");
+    when(issueService.findStatus("I")).thenReturn(Flux.just(issue));
+
+    webTestClient.get()
+            .uri("/tema/inactive")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(Issue.class)
+            .hasSize(1);
+}
+
+@Test
+void testUpdateIssueFound() {
+    Issue existing = sampleIssue();
+    Issue updated = sampleIssue();
+    updated.setName("Nuevo Tema");
+
+    when(issueService.findById(1L)).thenReturn(Mono.just(existing));
+    when(issueService.save(any(Issue.class))).thenReturn(Mono.just(updated));
+
+    webTestClient.put()
+            .uri("/tema/update/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(updated)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.name").isEqualTo("Nuevo Tema");
+}
+
+@Test
+void testUpdateIssueNotFound() {
+    Issue updated = sampleIssue();
+    updated.setName("Nuevo Tema");
+
+    when(issueService.findById(1L)).thenReturn(Mono.empty());
+
+    webTestClient.put()
+            .uri("/tema/update/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(updated)
+            .exchange()
+            .expectStatus().isNotFound();
+}
+
+@Test
+void testDeactivateIssueFound() {
+    Issue issue = sampleIssue();
+    issue.setState("A");
+
+    when(issueService.findById(1L)).thenReturn(Mono.just(issue));
+    when(issueService.save(any())).thenReturn(Mono.just(issue));
+
+    webTestClient.delete()
+            .uri("/tema/deactivate/1")
+            .exchange()
+            .expectStatus().isOk();
+}
+
+@Test
+void testDeactivateIssueNotFound() {
+    when(issueService.findById(1L)).thenReturn(Mono.empty());
+
+    webTestClient.delete()
+            .uri("/tema/deactivate/1")
+            .exchange()
+            .expectStatus().isNotFound();
+}
+
 }
