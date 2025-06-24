@@ -28,7 +28,7 @@ public class KafkaConsumerService {
     @KafkaListener(topics = "workshop-events", groupId = "issue-group")
     public void consumeWorkshopEvent(ConsumerRecord<String, String> consumerRecord) {
         try {
-            String json = record.value();
+            String json = consumerRecord.value();
             WorkshopKafkaEventDto dto = objectMapper.readValue(json, WorkshopKafkaEventDto.class);
             log.info("📥 Recibido evento Kafka: {}", dto);
 
