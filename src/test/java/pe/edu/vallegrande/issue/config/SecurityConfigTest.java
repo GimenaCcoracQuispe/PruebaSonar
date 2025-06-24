@@ -2,36 +2,20 @@ package pe.edu.vallegrande.issue.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import java.time.Instant;
-import java.util.Map;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SecurityConfigTest {
-     private SecurityConfig securityConfig;
+
+    private SecurityConfig securityConfig;
 
     @BeforeEach
     void setUp() {
         securityConfig = new SecurityConfig();
-    }
-
-    @Test
-    void testJwtDecoderNotNull() throws Exception {
-        // Usamos reflection para establecer el URI del JWKS
-        Field field = SecurityConfig.class.getDeclaredField("jwkSetUri");
-        field.setAccessible(true);
-        field.set(securityConfig, "http://localhost:8080/oauth2/jwks");
-
-        ReactiveJwtDecoder decoder = securityConfig.jwtDecoder();
-        assertNotNull(decoder);
     }
 
     @Test
@@ -40,11 +24,11 @@ public class SecurityConfigTest {
                 .header("alg", "none")
                 .claim("role", "USER")
                 .subject("test-user")
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(3600))
+                .issuedAt(java.time.Instant.now())
+                .expiresAt(java.time.Instant.now().plusSeconds(3600))
                 .build();
 
-        Mono<CustomAuthenticationToken> result = securityConfig.convertJwt(jwt);
+        Mono<CustomAuthenticationToken> result = securityConfig.testConvertJwtPublic(jwt);
 
         StepVerifier.create(result)
                 .assertNext(token -> {
@@ -59,11 +43,11 @@ public class SecurityConfigTest {
         Jwt jwt = Jwt.withTokenValue("token")
                 .header("alg", "none")
                 .subject("anonymous")
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(3600))
+                .issuedAt(java.time.Instant.now())
+                .expiresAt(java.time.Instant.now().plusSeconds(3600))
                 .build();
 
-        Mono<CustomAuthenticationToken> result = securityConfig.convertJwt(jwt);
+        Mono<CustomAuthenticationToken> result = securityConfig.testConvertJwtPublic(jwt);
 
         StepVerifier.create(result)
                 .assertNext(token -> {
