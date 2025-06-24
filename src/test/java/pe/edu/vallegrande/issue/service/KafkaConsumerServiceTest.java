@@ -7,15 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.r2dbc.core.ReactiveInsertOperation;
-import org.springframework.test.util.ReflectionTestUtils;
 import pe.edu.vallegrande.issue.dto.WorkshopKafkaEventDto;
 import pe.edu.vallegrande.issue.model.Workshop;
 import pe.edu.vallegrande.issue.repository.WorkshopRepository;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Constructor;
 import java.time.LocalDate;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 class KafkaConsumerServiceTest {
 
@@ -38,7 +39,7 @@ class KafkaConsumerServiceTest {
     private Workshop workshop;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
         dto = new WorkshopKafkaEventDto();
@@ -49,13 +50,18 @@ class KafkaConsumerServiceTest {
         dto.setEndDate(LocalDate.of(2025, 1, 30));
         dto.setState("A");
 
-        workshop = ReflectionTestUtils.invokeConstructor(Workshop.class);
-        ReflectionTestUtils.setField(workshop, "id", dto.getId());
-        ReflectionTestUtils.setField(workshop, "name", dto.getName());
-        ReflectionTestUtils.setField(workshop, "description", dto.getDescription());
-        ReflectionTestUtils.setField(workshop, "startDate", dto.getStartDate());
-        ReflectionTestUtils.setField(workshop, "endDate", dto.getEndDate());
-        ReflectionTestUtils.setField(workshop, "state", dto.getState());
+        // 🔧 Instanciar Workshop con constructor package-private
+        Constructor<Workshop> constructor = Workshop.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        workshop = constructor.newInstance();
+
+        // 🔧 Setear campos manualmente
+        setField(workshop, "id", dto.getId());
+        setField(workshop, "name", dto.getName());
+        setField(workshop, "description", dto.getDescription());
+        setField(workshop, "startDate", dto.getStartDate());
+        setField(workshop, "endDate", dto.getEndDate());
+        setField(workshop, "state", dto.getState());
     }
 
     @Test
