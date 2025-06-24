@@ -80,4 +80,45 @@ class IssueServiceTest {
 
         verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
     }
+
+     @Test
+void testSaveIssue() {
+    Issue issue = sampleIssue();
+    when(issueRepository.save(issue)).thenReturn(Mono.just(issue));
+
+    StepVerifier.create(issueService.save(issue))
+            .expectNext(issue)
+            .verifyComplete();
+
+    verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
+}
+
+@Test
+void testFindStatus() {
+    Issue issue = sampleIssue();
+    when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
+
+    StepVerifier.create(issueService.findStatus("A"))
+            .expectNext(issue)
+            .verifyComplete();
+}
+
+@Test
+void testGetIssueByState() {
+    Issue issue = sampleIssue();
+    when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
+
+    StepVerifier.create(issueService.getIssueBystate("A"))
+            .expectNext(issue)
+            .verifyComplete();
+}
+
+@Test
+void testInactiveIssue() {
+    when(issueRepository.inactiveIssue(1L)).thenReturn(Mono.empty());
+
+    StepVerifier.create(issueService.inactiveIssue(1L))
+            .verifyComplete();
+}
+
 }
