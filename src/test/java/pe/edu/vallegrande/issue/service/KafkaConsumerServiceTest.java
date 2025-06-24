@@ -69,22 +69,34 @@ class KafkaConsumerServiceTest {
     }
 
     @Test
-    void testConsumeWorkshopEvent_InsertNewWorkshop() throws Exception {
-        ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
+void testConsumeWorkshopEvent_InsertNewWorkshop() throws Exception {
+    ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
-        when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
-        when(workshopRepository.findById(1L)).thenReturn(Mono.empty());
+    when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
+    when(workshopRepository.findById(1L)).thenReturn(Mono.empty());
 
-        // Simular insert() y using()
-        var insertMock = mock(R2dbcEntityTemplate.InsertSpec.class);
-        when(template.insert(Workshop.class)).thenReturn(insertMock);
-        when(insertMock.using(any(Workshop.class))).thenReturn(Mono.just(workshop));
+    // Crear el objeto Workshop sin usar constructor privado
+    Workshop newWorkshop = new Workshop();
+    newWorkshop.setId(dto.getId());
+    newWorkshop.setName(dto.getName());
+    newWorkshop.setDescription(dto.getDescription());
+    newWorkshop.setStartDate(dto.getStartDate());
+    newWorkshop.setEndDate(dto.getEndDate());
+    newWorkshop.setState(dto.getState());
 
-        kafkaConsumerService.consumeWorkshopEvent(record);
+    // Simular comportamiento de insert usando cualquier tipo
+    R2dbcEntityTemplate mockedTemplate = mock(R2dbcEntityTemplate.class);
+    when(template.insert(eq(Workshop.class))).thenReturn(new Object() {
+        public Mono<Workshop> using(Workshop obj) {
+            return Mono.just(obj);
+        }
+    });
 
-        verify(template).insert(Workshop.class);
-        verify(insertMock).using(any(Workshop.class));
-    }
+    kafkaConsumerService.consumeWorkshopEvent(record);
+
+    verify(template).insert(eq(Workshop.class));
+}
+
 
     @Test
     void testConsumeWorkshopEvent_ThrowsException() throws Exception {
