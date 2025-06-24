@@ -47,14 +47,14 @@ class KafkaConsumerServiceTest {
 
     @Test
     void testConsumeWorkshopEvent_InsertNewWorkshop() throws Exception {
-        ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
+        ConsumerRecord<String, String> consumerRecord = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
         when(objectMapper.readValue("json-body", WorkshopEvent.class)).thenReturn(workshopEvent);
         when(template.selectOne(any(), eq(WorkshopEvent.class))).thenReturn(Mono.empty());
         when(template.insert(WorkshopEvent.class)).thenReturn(reactiveInsert);
         when(reactiveInsert.using(any(WorkshopEvent.class))).thenReturn(Mono.just(workshopEvent));
 
-        kafkaConsumer.consumeWorkshopEvent(record);
+        kafkaConsumer.consumeWorkshopEvent(consumerRecord );
 
         verify(template).insert(WorkshopEvent.class);
         verify(reactiveInsert).using(any(WorkshopEvent.class));
@@ -62,12 +62,12 @@ class KafkaConsumerServiceTest {
 
     @Test
     void testConsumeWorkshopEvent_ThrowsException() throws Exception {
-        ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "invalid-json");
+        ConsumerRecord<String, String> consumerRecord = new ConsumerRecord<>("workshop-events", 0, 0L, null, "invalid-json");
 
         when(objectMapper.readValue("invalid-json", WorkshopEvent.class))
                 .thenThrow(new RuntimeException("Invalid JSON"));
 
-        kafkaConsumer.consumeWorkshopEvent(record);
+        kafkaConsumer.consumeWorkshopEvent(consumerRecord );
 
         verify(template, never()).insert(any());
         verify(template, never()).update(any());

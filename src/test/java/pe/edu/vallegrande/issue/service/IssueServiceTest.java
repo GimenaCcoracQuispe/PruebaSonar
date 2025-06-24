@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class IssueServiceTest {
-     @Mock
+    @Mock
     private IssueRepository issueRepository;
 
     @Mock
@@ -34,7 +34,7 @@ class IssueServiceTest {
         Issue issue = new Issue();
         issue.setId(1L);
         issue.setName("Tema 1");
-        issue.setWorkshopId(Integer.valueOf("1")); 
+        issue.setWorkshopId(Integer.valueOf("1"));
         issue.setState("A");
         return issue;
     }
@@ -83,44 +83,44 @@ class IssueServiceTest {
         verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueEvent.class));
     }
 
-     @Test
-void testSaveIssue() {
-    Issue issue = sampleIssue();
-    when(issueRepository.save(issue)).thenReturn(Mono.just(issue));
+    @Test
+    void testSaveIssue() {
+        Issue issue = sampleIssue();
+        when(issueRepository.save(issue)).thenReturn(Mono.just(issue));
 
-    StepVerifier.create(issueService.save(issue))
-            .expectNext(issue)
-            .verifyComplete();
+        StepVerifier.create(issueService.save(issue))
+                .expectNext(issue)
+                .verifyComplete();
 
-    verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueEvent.class));
-}
+        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueEvent.class));
+    }
 
-@Test
-void testFindStatus() {
-    Issue issue = sampleIssue();
-    when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
+    @Test
+    void testFindStatus() {
+        Issue issue = sampleIssue();
+        when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
 
-    StepVerifier.create(issueService.findStatus("A"))
-            .expectNext(issue)
-            .verifyComplete();
-}
+        StepVerifier.create(issueService.findStatus("A"))
+                .expectNext(issue)
+                .verifyComplete();
+    }
 
-@Test
-void testGetIssueByState() {
-    Issue issue = sampleIssue();
-    when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
+    @Test
+    void testGetIssueByState() {
+        Issue issue = sampleIssue();
+        when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
 
-    StepVerifier.create(issueService.getIssueBystate("A"))
-            .expectNext(issue)
-            .verifyComplete();
-}
+        StepVerifier.create(issueService.getIssueBystate("A"))
+                .expectNext(issue)
+                .verifyComplete();
+    }
 
-@Test
-void testInactiveIssue() {
-    when(issueRepository.inactiveIssue(1L)).thenReturn(Mono.empty());
+    @Test
+    void testInactiveIssue() {
+        when(issueRepository.inactiveIssue(1L)).thenReturn(Mono.empty());
 
-    StepVerifier.create(issueService.inactiveIssue(1L))
-            .verifyComplete();
-}
+        StepVerifier.create(issueService.inactiveIssue(1L))
+                .verifyComplete();
+    }
 
 }

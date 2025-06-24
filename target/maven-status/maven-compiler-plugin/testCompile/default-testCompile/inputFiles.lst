@@ -1,6 +1,0 @@
-/workspaces/PruebaSonar/src/test/java/pe/edu/vallegrande/issue/IssueApplicationTests.java
-/workspaces/PruebaSonar/src/test/java/pe/edu/vallegrande/issue/config/DotenvInitializer.java
-/workspaces/PruebaSonar/src/test/java/pe/edu/vallegrande/issue/config/TestSecurityConfig.java
-/workspaces/PruebaSonar/src/test/java/pe/edu/vallegrande/issue/controller/IssueControllerTest.java
-/workspaces/PruebaSonar/src/test/java/pe/edu/vallegrande/issue/kafka/KafkaConsumerTest.java
-/workspaces/PruebaSonar/src/test/java/pe/edu/vallegrande/issue/service/IssueServiceTest.java

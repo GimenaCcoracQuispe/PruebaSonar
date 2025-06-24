@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pe.edu.vallegrande.issue.model.Issue;
 import pe.edu.vallegrande.issue.service.IssueService;
@@ -13,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-public class IssueControllerTest {
+class IssueControllerTest {
     @Mock
     private IssueService issueService;
 
