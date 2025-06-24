@@ -65,7 +65,7 @@ public class IssueController {
                     }
                     return issueService.save(existingIssue);
                 })
-                .map(updated -> ResponseEntity.ok(updated))
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
