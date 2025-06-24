@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.r2dbc.core.ReactiveInsertOperation;
+import org.springframework.test.util.ReflectionTestUtils;
 import pe.edu.vallegrande.issue.dto.WorkshopKafkaEventDto;
 import pe.edu.vallegrande.issue.model.Workshop;
 import pe.edu.vallegrande.issue.repository.WorkshopRepository;
@@ -48,15 +49,13 @@ class KafkaConsumerServiceTest {
         dto.setEndDate(LocalDate.of(2025, 1, 30));
         dto.setState("A");
 
-        workshop = new Workshop(
-    dto.getId(),
-    dto.getName(),
-    dto.getDescription(),
-    dto.getStartDate(),
-    dto.getEndDate(),
-    dto.getState()
-);
-
+        workshop = ReflectionTestUtils.invokeConstructor(Workshop.class);
+        ReflectionTestUtils.setField(workshop, "id", dto.getId());
+        ReflectionTestUtils.setField(workshop, "name", dto.getName());
+        ReflectionTestUtils.setField(workshop, "description", dto.getDescription());
+        ReflectionTestUtils.setField(workshop, "startDate", dto.getStartDate());
+        ReflectionTestUtils.setField(workshop, "endDate", dto.getEndDate());
+        ReflectionTestUtils.setField(workshop, "state", dto.getState());
     }
 
     @Test
