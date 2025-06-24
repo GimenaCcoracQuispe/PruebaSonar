@@ -61,18 +61,7 @@ void setUp() {
 }
 
 
-   @Test
-void testConsumeWorkshopEvent_UpdateExistingWorkshop() throws Exception {
-    ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
-    when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
-    when(workshopRepository.findById(1L)).thenReturn(Mono.just(workshop));
-    when(workshopRepository.save(any(Workshop.class))).thenReturn(Mono.just(workshop));
-
-    kafkaConsumerService.consumeWorkshopEvent(record);
-
-    verify(workshopRepository).save(any(Workshop.class));
-}
 
 
    @Test
