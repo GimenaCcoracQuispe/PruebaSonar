@@ -39,30 +39,27 @@ class KafkaConsumerServiceTest {
     private Workshop workshop;
 
     @BeforeEach
-    void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
+void setUp() {
+    MockitoAnnotations.openMocks(this);
 
-        dto = new WorkshopKafkaEventDto();
-        dto.setId(1L);
-        dto.setName("Test Workshop");
-        dto.setDescription("Description");
-        dto.setStartDate(LocalDate.of(2025, 1, 1));
-        dto.setEndDate(LocalDate.of(2025, 1, 30));
-        dto.setState("A");
+    dto = new WorkshopKafkaEventDto();
+    dto.setId(1L);
+    dto.setName("Test Workshop");
+    dto.setDescription("Description");
+    dto.setStartDate(LocalDate.of(2025, 1, 1));
+    dto.setEndDate(LocalDate.of(2025, 1, 30));
+    dto.setState("A");
 
-        // 🔧 Instanciar Workshop con constructor package-private
-        Constructor<Workshop> constructor = Workshop.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        workshop = constructor.newInstance();
+    // 🔧 Usamos mock para evitar errores con el constructor
+    workshop = mock(Workshop.class);
+    when(workshop.getId()).thenReturn(dto.getId());
+    when(workshop.getName()).thenReturn(dto.getName());
+    when(workshop.getDescription()).thenReturn(dto.getDescription());
+    when(workshop.getStartDate()).thenReturn(dto.getStartDate());
+    when(workshop.getEndDate()).thenReturn(dto.getEndDate());
+    when(workshop.getState()).thenReturn(dto.getState());
+}
 
-        // 🔧 Setear campos manualmente
-        setField(workshop, "id", dto.getId());
-        setField(workshop, "name", dto.getName());
-        setField(workshop, "description", dto.getDescription());
-        setField(workshop, "startDate", dto.getStartDate());
-        setField(workshop, "endDate", dto.getEndDate());
-        setField(workshop, "state", dto.getState());
-    }
 
     @Test
     void testConsumeWorkshopEvent_UpdateExistingWorkshop() throws Exception {
