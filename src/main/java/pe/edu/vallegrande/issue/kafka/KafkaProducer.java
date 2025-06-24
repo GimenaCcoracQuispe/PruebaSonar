@@ -1,4 +1,4 @@
-package pe.edu.vallegrande.issue.service;
+package pe.edu.vallegrande.issue.kafka;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import pe.edu.vallegrande.issue.dto.IssueKafkaEventDto;
+import pe.edu.vallegrande.issue.model.event.IssueEvent;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class kafkaProducerService {
+public class KafkaProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
@@ -20,10 +20,11 @@ public class kafkaProducerService {
 
     /**
      * 🔹 Envía un evento relacionado a un taller al topic de Kafka "issue-events".
-     * Convierte el DTO a JSON, lo publica en Kafka, y muestra logs de éxito o error.
+     * Convierte el DTO a JSON, lo publica en Kafka, y muestra logs de éxito o
+     * error.
      */
 
-     public void sendWorkshopEvent(IssueKafkaEventDto eventDto) {
+    public void sendWorkshopEvent(IssueEvent eventDto) {
         try {
             String message = objectMapper.writeValueAsString(eventDto);
             kafkaTemplate.send(TOPIC, String.valueOf(eventDto.getId()), message);

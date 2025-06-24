@@ -8,7 +8,7 @@ import pe.edu.vallegrande.issue.model.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface IssueRepository extends ReactiveCrudRepository<Issue, Long>{
+public interface IssueRepository extends ReactiveCrudRepository<Issue, Long> {
     Flux<Issue> findAllByState(String state);
 
     @Modifying
@@ -20,5 +20,6 @@ public interface IssueRepository extends ReactiveCrudRepository<Issue, Long>{
     Mono<Void> activateIssue(Long id);
 
     Mono<Integer> findMaxCodeByWorkshopId(Integer workshopId);
+
     Mono<Issue> findTopByOrderByIdDesc();
 }

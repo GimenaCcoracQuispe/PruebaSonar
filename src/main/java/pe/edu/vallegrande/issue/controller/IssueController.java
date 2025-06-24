@@ -32,7 +32,7 @@ public class IssueController {
         return issueService.findAllIssue();
     }
 
-    @GetMapping("/{id}")  
+    @GetMapping("/{id}")
     public Mono<Issue> getIssueById(@PathVariable Long id) {
         return issueService.findById(id);
     }
@@ -73,7 +73,7 @@ public class IssueController {
     public Mono<ResponseEntity<Void>> activateIssue(@PathVariable Long id) {
         return issueService.findById(id)
                 .flatMap(existingIssue -> {
-                    existingIssue.setState("A"); 
+                    existingIssue.setState("A");
                     return issueService.save(existingIssue).then(Mono.just(ResponseEntity.ok().<Void>build()));
                 })
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -83,7 +83,7 @@ public class IssueController {
     public Mono<ResponseEntity<Void>> deactivateIssue(@PathVariable Long id) {
         return issueService.findById(id)
                 .flatMap(existingIssue -> {
-                    existingIssue.setState("I"); 
+                    existingIssue.setState("I");
                     return issueService.save(existingIssue).then(Mono.just(ResponseEntity.ok().<Void>build()));
                 })
                 .defaultIfEmpty(ResponseEntity.notFound().build());

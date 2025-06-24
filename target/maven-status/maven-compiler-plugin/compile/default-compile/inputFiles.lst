@@ -3,12 +3,10 @@
 /workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/config/CustomAuthenticationToken.java
 /workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/config/SecurityConfig.java
 /workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/controller/IssueController.java
-/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/dto/IssueKafkaEventDto.java
-/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/dto/WorkshopKafkaEventDto.java
+/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/kafka/KafkaConsumer.java
+/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/kafka/KafkaProducer.java
 /workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/model/Issue.java
-/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/model/Workshop.java
+/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/model/event/IssueEvent.java
+/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/model/event/WorkshopEvent.java
 /workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/repository/IssueRepository.java
-/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/repository/WorkshopRepository.java
 /workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/service/IssueService.java
-/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/service/KafkaConsumerService.java
-/workspaces/PruebaSonar/src/main/java/pe/edu/vallegrande/issue/service/kafkaProducerService.java

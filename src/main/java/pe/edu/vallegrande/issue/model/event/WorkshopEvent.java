@@ -1,10 +1,13 @@
-package pe.edu.vallegrande.issue.dto;
+package pe.edu.vallegrande.issue.model.event;
+
 import java.time.LocalDate;
 
+import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
-public class WorkshopKafkaEventDto {
+public class WorkshopEvent {
     private Long id;
     private String name;
     private String description;

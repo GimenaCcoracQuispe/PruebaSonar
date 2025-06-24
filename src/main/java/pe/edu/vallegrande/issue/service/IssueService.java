@@ -3,8 +3,9 @@ package pe.edu.vallegrande.issue.service;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import pe.edu.vallegrande.issue.dto.IssueKafkaEventDto;
+import pe.edu.vallegrande.issue.kafka.KafkaProducer;
 import pe.edu.vallegrande.issue.model.Issue;
+import pe.edu.vallegrande.issue.model.event.IssueEvent;
 import pe.edu.vallegrande.issue.repository.IssueRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,9 +14,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class IssueService {
     private final IssueRepository issueRepository;
-    private final kafkaProducerService kafkaProducer;
+    private final KafkaProducer kafkaProducer;
 
-    public IssueService(IssueRepository issueRepository, kafkaProducerService kafkaProducer) {
+    public IssueService(IssueRepository issueRepository, KafkaProducer kafkaProducer) {
         this.issueRepository = issueRepository;
         this.kafkaProducer = kafkaProducer;
     }
@@ -58,9 +59,9 @@ public class IssueService {
                 });
     }
 
-    // 🔸 Convierte Issue → IssueKafkaEventDto
-    private IssueKafkaEventDto toKafkaDto(Issue issue) {
-        IssueKafkaEventDto dto = new IssueKafkaEventDto();
+    // 🔸 Convierte Issue → IssueEvent
+    private IssueEvent toKafkaDto(Issue issue) {
+        IssueEvent dto = new IssueEvent();
         dto.setId(issue.getId());
         dto.setName(issue.getName());
         dto.setWorkshopId(issue.getWorkshopId());

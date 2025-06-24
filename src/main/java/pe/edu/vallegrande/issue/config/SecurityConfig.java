@@ -92,5 +92,4 @@ public class SecurityConfig {
                 return Mono.just(new CustomAuthenticationToken(jwt, authorities));
         }
 
-
 }

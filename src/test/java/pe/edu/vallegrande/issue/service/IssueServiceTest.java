@@ -6,8 +6,10 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import pe.edu.vallegrande.issue.dto.IssueKafkaEventDto;
+
+import pe.edu.vallegrande.issue.kafka.KafkaProducer;
 import pe.edu.vallegrande.issue.model.Issue;
+import pe.edu.vallegrande.issue.model.event.IssueEvent;
 import pe.edu.vallegrande.issue.repository.IssueRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,7 +20,7 @@ class IssueServiceTest {
     private IssueRepository issueRepository;
 
     @Mock
-    private kafkaProducerService kafkaProducer;
+    private KafkaProducer kafkaProducer;
 
     @InjectMocks
     private IssueService issueService;
@@ -66,7 +68,7 @@ class IssueServiceTest {
                 .expectNext(issue)
                 .verifyComplete();
 
-        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
+        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueEvent.class));
     }
 
     @Test
@@ -78,7 +80,7 @@ class IssueServiceTest {
         StepVerifier.create(issueService.deleteById(1L))
                 .verifyComplete();
 
-        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
+        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueEvent.class));
     }
 
      @Test
@@ -90,7 +92,7 @@ void testSaveIssue() {
             .expectNext(issue)
             .verifyComplete();
 
-    verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
+    verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueEvent.class));
 }
 
 @Test
