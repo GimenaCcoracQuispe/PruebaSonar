@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 @WebFluxTest(controllers = IssueController.class)
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)  // si tienes configuración de seguridad para tests
+@Import(TestSecurityConfig.class) // si tienes configuración de seguridad para tests
 class IssueControllerTest {
 
     @Autowired
