@@ -20,6 +20,4 @@ import pe.edu.vallegrande.issue.config.TestSecurityConfig;
 @ActiveProfiles("test")
 class IssueApplicationTests {
 
-    // @Test
-    // void contextLoads() { }
 }
