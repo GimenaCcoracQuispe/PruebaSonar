@@ -1,0 +1,73 @@
+package pe.edu.vallegrande.issue.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.util.concurrent.SettableListenableFuture;
+import pe.edu.vallegrande.issue.dto.IssueKafkaEventDto;
+
+import java.time.LocalDate;
+
+import static org.mockito.Mockito.*;
+
+class KafkaProducerServiceTest {
+
+    @Mock
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @InjectMocks
+    private kafkaProducerService producerService;
+
+    private IssueKafkaEventDto dto;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        dto = new IssueKafkaEventDto();
+        dto.setId(1L);
+        dto.setStudentId("ST001");
+        dto.setWorkshopId("WS001");
+        dto.setObservation("Participación activa");
+        dto.setDate(LocalDate.of(2025, 6, 24));
+        dto.setState("A");
+    }
+
+    @Test
+    void testSendWorkshopEvent_Success() throws Exception {
+        String json = "{\"id\":1}";
+
+        // Simula serialización exitosa
+        when(objectMapper.writeValueAsString(dto)).thenReturn(json);
+
+        // Simula envío exitoso con Kafka
+        SettableListenableFuture future = new SettableListenableFuture<>();
+        future.set(mock(RecordMetadata.class));
+        when(kafkaTemplate.send(anyString(), anyString(), anyString())).thenReturn(future);
+
+        // Ejecutar
+        producerService.sendWorkshopEvent(dto);
+
+        // Verifica que se haya llamado a Kafka
+        verify(kafkaTemplate).send("issue-events", "1", json);
+    }
+
+    @Test
+    void testSendWorkshopEvent_SerializationFails() throws JsonProcessingException {
+        when(objectMapper.writeValueAsString(dto)).thenThrow(new JsonProcessingException("Error") {
+        });
+
+        // Ejecutar
+        producerService.sendWorkshopEvent(dto);
+
+        // Asegura que Kafka no fue invocado
+        verifyNoInteractions(kafkaTemplate);
+    }
+}
