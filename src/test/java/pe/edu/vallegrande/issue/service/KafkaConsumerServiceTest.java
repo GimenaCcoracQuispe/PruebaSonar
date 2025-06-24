@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Query;
 import pe.edu.vallegrande.issue.dto.WorkshopKafkaEventDto;
 import pe.edu.vallegrande.issue.model.Workshop;
 import pe.edu.vallegrande.issue.repository.WorkshopRepository;
@@ -37,23 +36,21 @@ class KafkaConsumerServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        dto = WorkshopKafkaEventDto.builder()
-                .id(1L)
-                .name("Test Workshop")
-                .description("Description")
-                .startDate(LocalDate.of(2025, 1, 1))
-                .endDate(LocalDate.of(2025, 1, 30))
-                .state("A")
-                .build();
+        dto = new WorkshopKafkaEventDto();
+        dto.setId(1L);
+        dto.setName("Test Workshop");
+        dto.setDescription("Description");
+        dto.setStartDate(LocalDate.of(2025, 1, 1));
+        dto.setEndDate(LocalDate.of(2025, 1, 30));
+        dto.setState("A");
 
-        workshop = Workshop.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .state(dto.getState())
-                .build();
+        workshop = new Workshop();
+        workshop.setId(dto.getId());
+        workshop.setName(dto.getName());
+        workshop.setDescription(dto.getDescription());
+        workshop.setStartDate(dto.getStartDate());
+        workshop.setEndDate(dto.getEndDate());
+        workshop.setState(dto.getState());
     }
 
     @Test
@@ -61,7 +58,7 @@ class KafkaConsumerServiceTest {
         ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
         when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
-        when(workshopRepository.findById(1L)).thenReturn(Mono.just(workshop));
+        when(workshopRepository.findById(1L)).thenReturn(Mono.just(new Workshop()));
         when(workshopRepository.save(any(Workshop.class))).thenReturn(Mono.just(workshop));
 
         kafkaConsumerService.consumeWorkshopEvent(record);
@@ -75,16 +72,16 @@ class KafkaConsumerServiceTest {
 
         when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
         when(workshopRepository.findById(1L)).thenReturn(Mono.empty());
-        when(template.insert(Workshop.class)).thenReturn(new R2dbcEntityTemplate.InsertSpec<Workshop>() {
-            @Override
-            public Mono<Workshop> using(Workshop obj) {
-                return Mono.just(obj);
-            }
-        });
+
+        // Mock del insert() + using()
+        var insertMock = mock(R2dbcEntityTemplate.InsertSpec.class);
+        when(template.insert(Workshop.class)).thenReturn(insertMock);
+        when(insertMock.using(any(Workshop.class))).thenReturn(Mono.just(workshop));
 
         kafkaConsumerService.consumeWorkshopEvent(record);
 
         verify(template).insert(Workshop.class);
+        verify(insertMock).using(any(Workshop.class));
     }
 
     @Test
@@ -95,7 +92,6 @@ class KafkaConsumerServiceTest {
 
         kafkaConsumerService.consumeWorkshopEvent(record);
 
-        // No exception should propagate, just log error
         verifyNoInteractions(workshopRepository);
     }
 }
