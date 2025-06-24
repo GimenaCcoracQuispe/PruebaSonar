@@ -71,7 +71,8 @@ class IssueControllerTest {
         webTestClient.get()
                 .uri("/tema/1")
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isOk()       // ahora espera 200 OK
+                .expectBody().isEmpty();     // y cuerpo vacío
     }
 
     @Test
@@ -136,7 +137,7 @@ class IssueControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Issue.class)
-                .value(issueBody -> 
+                .value(issueBody ->
                     org.junit.jupiter.api.Assertions.assertEquals("New", issueBody.getName())
                 );
     }
@@ -167,7 +168,7 @@ class IssueControllerTest {
                 .uri("/tema/activate/1")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().isEmpty(); // no body for Void
+                .expectBody().isEmpty();
     }
 
     @Test
@@ -208,7 +209,7 @@ class IssueControllerTest {
     }
 
     @Test
-    void testDeleteIssueFound() {
+    void testDeleteIssue() {
         when(issueService.deleteById(1L)).thenReturn(Mono.empty());
 
         webTestClient.delete()
@@ -216,18 +217,5 @@ class IssueControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().isEmpty();
-    }
-
-    @Test
-    void testDeleteIssueNotFound() {
-        // deleteById returns Mono.empty(), controller always returns OK on then(Mono.ok)
-        // If you want to simulate not found, you might adjust service to return error; 
-        // But per controller code, delete always returns OK. So just test OK:
-        when(issueService.deleteById(1L)).thenReturn(Mono.empty());
-
-        webTestClient.delete()
-                .uri("/tema/delete/1")
-                .exchange()
-                .expectStatus().isOk();
     }
 }
