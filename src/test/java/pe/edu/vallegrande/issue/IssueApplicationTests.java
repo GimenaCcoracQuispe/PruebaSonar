@@ -1,10 +1,10 @@
-package pe.edu.vallegrande.asistencia;
+package pe.edu.vallegrande.issue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AsistenciaApplicationTests {
+class IssueApplicationTests {
 
 	@Test
 	void contextLoads() {

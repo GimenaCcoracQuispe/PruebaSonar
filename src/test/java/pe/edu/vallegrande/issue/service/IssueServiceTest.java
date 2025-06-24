@@ -1,80 +1,83 @@
-package pe.edu.vallegrande.asistencia.test;
+package pe.edu.vallegrande.issue.service;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-
-import pe.edu.vallegrande.asistencia.model.Issue;
-import pe.edu.vallegrande.asistencia.repository.IssueRepository;
-import pe.edu.vallegrande.asistencia.service.IssueService;
+import org.mockito.*;
+import pe.edu.vallegrande.issue.dto.IssueKafkaEventDto;
+import pe.edu.vallegrande.issue.model.Issue;
+import pe.edu.vallegrande.issue.repository.IssueRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
 public class IssueServiceTest {
-    @Mock
+     @Mock
     private IssueRepository issueRepository;
+
+    @Mock
+    private kafkaProducerService kafkaProducer;
 
     @InjectMocks
     private IssueService issueService;
 
-    private Issue issue;
-
     @BeforeEach
     void setUp() {
-        issue = new Issue();
+        MockitoAnnotations.openMocks(this);
+    }
+
+    private Issue sampleIssue() {
+        Issue issue = new Issue();
         issue.setId(1L);
+        issue.setName("Tema 1");
+        issue.setWorkshopId(Integer.valueOf("1")); 
         issue.setState("A");
+        return issue;
     }
 
     @Test
     void testFindAllIssue() {
+        Issue issue = sampleIssue();
         when(issueRepository.findAll()).thenReturn(Flux.just(issue));
 
         StepVerifier.create(issueService.findAllIssue())
                 .expectNext(issue)
                 .verifyComplete();
-
-        verify(issueRepository).findAll();
     }
 
     @Test
-    void testFindStatus() {
-        when(issueRepository.findAllByState("A")).thenReturn(Flux.just(issue));
+    void testFindById() {
+        Issue issue = sampleIssue();
+        when(issueRepository.findById(1L)).thenReturn(Mono.just(issue));
 
-        StepVerifier.create(issueService.findStatus("A"))
+        StepVerifier.create(issueService.findById(1L))
                 .expectNext(issue)
                 .verifyComplete();
-
-        verify(issueRepository).findAllByState("A");
     }
 
     @Test
     void testCreateIssue() {
+        Issue issue = sampleIssue();
         when(issueRepository.save(issue)).thenReturn(Mono.just(issue));
 
         StepVerifier.create(issueService.createIssue(issue))
                 .expectNext(issue)
                 .verifyComplete();
 
-        verify(issueRepository).save(issue);
+        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
     }
 
     @Test
     void testDeleteById() {
+        Issue issue = sampleIssue();
+        when(issueRepository.findById(1L)).thenReturn(Mono.just(issue));
         when(issueRepository.deleteById(1L)).thenReturn(Mono.empty());
 
         StepVerifier.create(issueService.deleteById(1L))
                 .verifyComplete();
 
-        verify(issueRepository).deleteById(1L);
+        verify(kafkaProducer, times(1)).sendWorkshopEvent(any(IssueKafkaEventDto.class));
     }
 }
-

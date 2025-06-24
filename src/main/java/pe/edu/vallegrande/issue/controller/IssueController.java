@@ -1,6 +1,7 @@
-package pe.edu.vallegrande.asistencia.rest;
+package pe.edu.vallegrande.issue.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,21 +10,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import lombok.extern.slf4j.Slf4j;
-import pe.edu.vallegrande.asistencia.model.Issue;
-import pe.edu.vallegrande.asistencia.service.IssueService;
+import pe.edu.vallegrande.issue.model.Issue;
+import pe.edu.vallegrande.issue.service.IssueService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 @RestController
 @RequestMapping("/tema")
 @Slf4j
-@CrossOrigin(origins = "http://localhost:4200") 
-public class IssueRestController {
+@CrossOrigin(origins = "*")
+public class IssueController {
     private final IssueService issueService;
 
-    public IssueRestController(IssueService issueService) {
+    public IssueController(IssueService issueService) {
         this.issueService = issueService;
     }
 
@@ -49,7 +49,6 @@ public class IssueRestController {
 
     @PostMapping("/create")
     public Mono<Issue> createIssue(@RequestBody Issue issue) {
-        // El estado será 'A' automáticamente por defecto si no se pasa en el JSON
         return issueService.createIssue(issue);
     }
 
@@ -57,11 +56,10 @@ public class IssueRestController {
     public Mono<ResponseEntity<Issue>> updateIssue(@PathVariable Long id, @RequestBody Issue updatedIssue) {
         return issueService.findById(id)
                 .flatMap(existingIssue -> {
-                    // Actualizar solo los campos proporcionados en el cuerpo del request
                     existingIssue.setName(updatedIssue.getName());
                     existingIssue.setWorkshopId(updatedIssue.getWorkshopId());
                     existingIssue.setScheduledTime(updatedIssue.getScheduledTime());
-                    // NO actualizar el estado si no se envía en el request
+                    existingIssue.setObservation(updatedIssue.getObservation());
                     if (updatedIssue.getState() != null) {
                         existingIssue.setState(updatedIssue.getState());
                     }
