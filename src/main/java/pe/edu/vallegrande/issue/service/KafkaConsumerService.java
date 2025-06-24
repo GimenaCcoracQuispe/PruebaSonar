@@ -26,7 +26,7 @@ public class KafkaConsumerService {
      * 🔹 Escucha eventos del topic "workshop-events" y sincroniza la información.
      */
     @KafkaListener(topics = "workshop-events", groupId = "issue-group")
-    public void consumeWorkshopEvent(ConsumerRecord<String, String> record) {
+    public void consumeWorkshopEvent(ConsumerRecord<String, String> consumerRecord) {
         try {
             String json = record.value();
             WorkshopKafkaEventDto dto = objectMapper.readValue(json, WorkshopKafkaEventDto.class);
