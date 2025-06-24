@@ -36,7 +36,9 @@ public class KafkaConsumer {
                     .description(dto.getDescription())
                     .startDate(dto.getStartDate())
                     .endDate(dto.getEndDate())
+                    .observation(dto.getObservation())
                     .state(dto.getState())
+                    .personId(dto.getPersonId())   
                     .build();
 
             // Upsert manual usando solo R2dbcEntityTemplate
@@ -47,7 +49,9 @@ public class KafkaConsumer {
                         existing.setDescription(workshop.getDescription());
                         existing.setStartDate(workshop.getStartDate());
                         existing.setEndDate(workshop.getEndDate());
+                        existing.setObservation(workshop.getObservation());
                         existing.setState(workshop.getState());
+                        existing.setPersonId(workshop.getPersonId());
                         return template.update(existing);
                     })
                     .switchIfEmpty(template.insert(WorkshopEvent.class).using(workshop))
