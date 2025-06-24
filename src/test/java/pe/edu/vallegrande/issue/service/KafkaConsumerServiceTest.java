@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveInsertOperation;
 import pe.edu.vallegrande.issue.dto.WorkshopKafkaEventDto;
 import pe.edu.vallegrande.issue.model.Workshop;
 import pe.edu.vallegrande.issue.repository.WorkshopRepository;
@@ -26,6 +27,9 @@ class KafkaConsumerServiceTest {
     @Mock
     private R2dbcEntityTemplate template;
 
+    @Mock
+    private ReactiveInsertOperation.ReactiveInsert<Workshop> reactiveInsert;
+
     @InjectMocks
     private KafkaConsumerService kafkaConsumerService;
 
@@ -44,15 +48,13 @@ class KafkaConsumerServiceTest {
         dto.setEndDate(LocalDate.of(2025, 1, 30));
         dto.setState("A");
 
-        // Usar constructor completo
-        workshop = new Workshop(
-            dto.getId(),
-            dto.getName(),
-            dto.getDescription(),
-            dto.getStartDate(),
-            dto.getEndDate(),
-            dto.getState()
-        );
+        workshop = new Workshop();
+        workshop.setId(dto.getId());
+        workshop.setName(dto.getName());
+        workshop.setDescription(dto.getDescription());
+        workshop.setStartDate(dto.getStartDate());
+        workshop.setEndDate(dto.getEndDate());
+        workshop.setState(dto.getState());
     }
 
     @Test
@@ -69,40 +71,26 @@ class KafkaConsumerServiceTest {
     }
 
     @Test
-void testConsumeWorkshopEvent_InsertNewWorkshop() throws Exception {
-    ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
+    void testConsumeWorkshopEvent_InsertNewWorkshop() throws Exception {
+        ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
-    when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
-    when(workshopRepository.findById(1L)).thenReturn(Mono.empty());
+        when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
+        when(workshopRepository.findById(1L)).thenReturn(Mono.empty());
+        when(template.insert(Workshop.class)).thenReturn(reactiveInsert);
+        when(reactiveInsert.using(any(Workshop.class))).thenReturn(Mono.just(workshop));
 
-    // Crear el objeto Workshop sin usar constructor privado
-    Workshop newWorkshop = new Workshop();
-    newWorkshop.setId(dto.getId());
-    newWorkshop.setName(dto.getName());
-    newWorkshop.setDescription(dto.getDescription());
-    newWorkshop.setStartDate(dto.getStartDate());
-    newWorkshop.setEndDate(dto.getEndDate());
-    newWorkshop.setState(dto.getState());
+        kafkaConsumerService.consumeWorkshopEvent(record);
 
-    // Simular comportamiento de insert usando cualquier tipo
-    R2dbcEntityTemplate mockedTemplate = mock(R2dbcEntityTemplate.class);
-    when(template.insert(eq(Workshop.class))).thenReturn(new Object() {
-        public Mono<Workshop> using(Workshop obj) {
-            return Mono.just(obj);
-        }
-    });
-
-    kafkaConsumerService.consumeWorkshopEvent(record);
-
-    verify(template).insert(eq(Workshop.class));
-}
-
+        verify(template).insert(Workshop.class);
+        verify(reactiveInsert).using(any(Workshop.class));
+    }
 
     @Test
     void testConsumeWorkshopEvent_ThrowsException() throws Exception {
         ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "invalid-json");
 
-        when(objectMapper.readValue("invalid-json", WorkshopKafkaEventDto.class)).thenThrow(new RuntimeException("Invalid JSON"));
+        when(objectMapper.readValue("invalid-json", WorkshopKafkaEventDto.class))
+                .thenThrow(new RuntimeException("Invalid JSON"));
 
         kafkaConsumerService.consumeWorkshopEvent(record);
 
