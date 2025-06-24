@@ -44,13 +44,15 @@ class KafkaConsumerServiceTest {
         dto.setEndDate(LocalDate.of(2025, 1, 30));
         dto.setState("A");
 
-        workshop = new Workshop();
-        workshop.setId(dto.getId());
-        workshop.setName(dto.getName());
-        workshop.setDescription(dto.getDescription());
-        workshop.setStartDate(dto.getStartDate());
-        workshop.setEndDate(dto.getEndDate());
-        workshop.setState(dto.getState());
+        // Usar constructor completo
+        workshop = new Workshop(
+            dto.getId(),
+            dto.getName(),
+            dto.getDescription(),
+            dto.getStartDate(),
+            dto.getEndDate(),
+            dto.getState()
+        );
     }
 
     @Test
@@ -58,7 +60,7 @@ class KafkaConsumerServiceTest {
         ConsumerRecord<String, String> record = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
 
         when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
-        when(workshopRepository.findById(1L)).thenReturn(Mono.just(new Workshop()));
+        when(workshopRepository.findById(1L)).thenReturn(Mono.just(workshop));
         when(workshopRepository.save(any(Workshop.class))).thenReturn(Mono.just(workshop));
 
         kafkaConsumerService.consumeWorkshopEvent(record);
@@ -73,7 +75,7 @@ class KafkaConsumerServiceTest {
         when(objectMapper.readValue("json-body", WorkshopKafkaEventDto.class)).thenReturn(dto);
         when(workshopRepository.findById(1L)).thenReturn(Mono.empty());
 
-        // Mock del insert() + using()
+        // Simular insert() y using()
         var insertMock = mock(R2dbcEntityTemplate.InsertSpec.class);
         when(template.insert(Workshop.class)).thenReturn(insertMock);
         when(insertMock.using(any(Workshop.class))).thenReturn(Mono.just(workshop));
@@ -90,8 +92,4 @@ class KafkaConsumerServiceTest {
 
         when(objectMapper.readValue("invalid-json", WorkshopKafkaEventDto.class)).thenThrow(new RuntimeException("Invalid JSON"));
 
-        kafkaConsumerService.consumeWorkshopEvent(record);
-
-        verifyNoInteractions(workshopRepository);
-    }
-}
+        kafkaConsumerService.consumeWorkshopEvent(r
