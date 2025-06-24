@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.HashMap;
 
 @TestConfiguration
-public class TestSecurityConfig {
+class TestSecurityConfig {
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         return token -> Mono.just(
