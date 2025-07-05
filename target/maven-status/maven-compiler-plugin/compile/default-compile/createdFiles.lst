@@ -1,0 +1,12 @@
+pe/edu/vallegrande/attendance/config/SecurityConfig.class
+pe/edu/vallegrande/attendance/config/CustomAuthenticationToken.class
+pe/edu/vallegrande/attendance/model/Attendance.class
+pe/edu/vallegrande/attendance/repository/AttendanceRepository.class
+pe/edu/vallegrande/attendance/AttendanceApplication.class
+pe/edu/vallegrande/attendance/model/event/IssueEvent$IssueEventBuilder.class
+pe/edu/vallegrande/attendance/config/AuthContextWebFilter.class
+pe/edu/vallegrande/attendance/kafka/KafkaConsumer.class
+pe/edu/vallegrande/attendance/model/event/AttendanceEvent.class
+pe/edu/vallegrande/attendance/controller/AttendanceController.class
+pe/edu/vallegrande/attendance/service/AttendanceService.class
+pe/edu/vallegrande/attendance/model/event/IssueEvent.class

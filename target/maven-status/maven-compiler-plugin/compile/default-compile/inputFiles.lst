@@ -1,0 +1,11 @@
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/AttendanceApplication.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/config/AuthContextWebFilter.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/config/CustomAuthenticationToken.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/config/SecurityConfig.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/controller/AttendanceController.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/kafka/KafkaConsumer.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/model/Attendance.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/model/event/AttendanceEvent.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/model/event/IssueEvent.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/repository/AttendanceRepository.java
+/workspaces/PRS1/src/main/java/pe/edu/vallegrande/attendance/service/AttendanceService.java
