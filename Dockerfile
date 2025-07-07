@@ -1,17 +1,25 @@
-# Usa la imagen oficial de OpenJDK 17 como base
-FROM openjdk:17-jdk-alpine
 
-# Establece el directorio de trabajo en el contenedor
+FROM maven:3.9.4-eclipse-temurin-17 AS builder
+
 WORKDIR /app
 
-COPY target/*.jar app.jar
+# Copia los archivos necesarios
+COPY pom.xml ./
+COPY src ./src
 
-ENV DATABASE_URL ${DATABASE_URL}
-ENV DATABASE_USERNAME ${DATABASE_USERNAME}
-ENV DATABASE_PASSWORD ${DATABASE_PASSWORD}
+# Empaqueta la app sin ejecutar tests (puedes quitar -DskipTests si deseas)
+RUN mvn clean package -DskipTests
 
-# Expone el puerto 8085 para acceso externo (asegúrate de que este sea el puerto correcto para tu aplicación)
-EXPOSE 8080
+# Etapa 2: Imagen final de producción con JDK liviano
+FROM eclipse-temurin:17-jdk-alpine
 
-# Define el punto de entrada para ejecutar la aplicación Java
+WORKDIR /app
+
+# Copia el jar desde el builder
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expón el puerto (Render usará la variable PORT automáticamente)
+EXPOSE 8081
+
+# Ejecuta la app
 ENTRYPOINT ["java", "-jar", "app.jar"]

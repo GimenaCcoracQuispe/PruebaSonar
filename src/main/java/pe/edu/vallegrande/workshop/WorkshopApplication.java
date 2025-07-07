@@ -1,13 +1,12 @@
-package pe.edu.vallegrande.asistencia;
+package pe.edu.vallegrande.workshop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AsistenciaApplication {
+public class WorkshopApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AsistenciaApplication.class, args);
+		SpringApplication.run(WorkshopApplication.class, args);
 	}
-
 }
