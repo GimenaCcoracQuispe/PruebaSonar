@@ -199,22 +199,27 @@ void testActivateWorkshop_NotFound() {
 
 @Test
 void testDeactivateWorkshop_Success() {
+    Mockito.when(workshopService.logicalDelete(1L)).thenReturn(Mono.just(workshop)); // ✅ Aquí
+
+    webTestClient.delete()
+            .uri("/api/workshops/deactive/1")
+            .exchange()
+            .expectStatus().isOk(); // ✅ Este sí espera 200 OK
+}
+
+
+@Test
+void testDeactivateWorkshop_NotFound() {
     Mockito.when(workshopService.logicalDelete(1L)).thenReturn(Mono.empty());
 
     webTestClient.delete()
             .uri("/api/workshops/deactive/1")
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isNotFound(); // ✅ Este sí debe recibir 404
 }
 
-@Test
-void testDeactivateWorkshop_NotFound() {
-    Mockito.when(workshopService.logicalDelete(1L)).thenReturn(Mono.error(new RuntimeException("Not found")));
 
-    webTestClient.delete()
-            .uri("/api/workshops/deactive/1")
-            .exchange()
-            .expectStatus().is5xxServerError();
-}
+
+
 
 }

@@ -79,9 +79,11 @@ public class WorkshopController {
     }
 
     @DeleteMapping("/deactive/{id}")
-    public Mono<ResponseEntity<Void>> deactivateWorkshop(@PathVariable Long id) {
-        return workshopService.logicalDelete(id)
-                .thenReturn(ResponseEntity.ok().<Void>build())
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
+public Mono<ResponseEntity<Void>> deactivateWorkshop(@PathVariable Long id) {
+    return workshopService.logicalDelete(id)
+            .map(r -> ResponseEntity.ok().<Void>build()) // Usar .map()
+            .defaultIfEmpty(ResponseEntity.notFound().build()); // Retornar 404 si está vacío
+}
+
+
 }
