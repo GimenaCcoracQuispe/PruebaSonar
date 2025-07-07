@@ -73,5 +73,4 @@ class KafkaConsumerServiceTest {
         verify(template, never()).update(any());
     }
 
-
 }

@@ -55,4 +55,22 @@ public class CustomAuthenticationToken extends AbstractAuthenticationToken {
         return jwt.getSubject();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof CustomAuthenticationToken))
+            return false;
+        if (!super.equals(obj))
+            return false;
+
+        CustomAuthenticationToken other = (CustomAuthenticationToken) obj;
+        return jwt.equals(other.jwt);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * super.hashCode() + jwt.hashCode();
+    }
+
 }
