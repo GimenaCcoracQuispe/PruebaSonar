@@ -72,4 +72,28 @@ class KafkaConsumerServiceTest {
         verify(template, never()).insert(any());
         verify(template, never()).update(any());
     }
+
+    @Test
+void testConsumeWorkshopEvent_UpdateExistingWorkshop() throws Exception {
+    ConsumerRecord<String, String> consumerRecord = new ConsumerRecord<>("workshop-events", 0, 0L, null, "json-body");
+
+    WorkshopEvent existingEvent = WorkshopEvent.builder()
+            .id(1L)
+            .name("Old Workshop")
+            .description("Old description")
+            .startDate(LocalDate.of(2024, 1, 1))
+            .endDate(LocalDate.of(2024, 1, 30))
+            .state("I")
+            .build();
+
+    when(objectMapper.readValue("json-body", WorkshopEvent.class)).thenReturn(workshopEvent);
+    when(template.selectOne(any(), eq(WorkshopEvent.class))).thenReturn(Mono.just(existingEvent));
+    when(template.update(any(WorkshopEvent.class))).thenReturn(Mono.just(workshopEvent));
+
+    kafkaConsumer.consumeWorkshopEvent(consumerRecord);
+
+    verify(template).selectOne(any(), eq(WorkshopEvent.class));
+    verify(template).update(any(WorkshopEvent.class));
+}
+
 }
