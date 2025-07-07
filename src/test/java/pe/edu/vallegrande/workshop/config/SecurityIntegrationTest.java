@@ -1,5 +1,6 @@
 package pe.edu.vallegrande.workshop.config;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +10,47 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import pe.edu.vallegrande.workshop.model.Workshop;
+import pe.edu.vallegrande.workshop.repository.WorkshopRepository;
+
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Collections;
+
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 
 @DisplayName("🔐 Tests de Seguridad para WorkshopController")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-@ActiveProfiles("test") 
+@ActiveProfiles("test")
 public class SecurityIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @Autowired
+    private WorkshopRepository workshopRepository;
+
+    private Long workshopId;
+
+    @BeforeEach
+    void setup() {
+        this.webTestClient = this.webTestClient.mutate()
+                .responseTimeout(Duration.ofSeconds(10))
+                .build();
+
+        // Crear un nuevo workshop y guardar el ID generado
+        Workshop workshop = new Workshop();
+        workshop.setName("Taller de Seguridad");
+        workshop.setDescription("Test para Admin");
+        workshop.setStartDate(LocalDate.of(2025, 1, 1));
+        workshop.setEndDate(LocalDate.of(2025, 12, 31));
+        workshop.setObservation("Prueba de seguridad");
+        workshop.setState("A");
+        workshop.setPersonId("1,2");
+
+        this.workshopId = workshopRepository.save(workshop).map(Workshop::getId).block();
+    }
 
     @Test
     @DisplayName("❌ GET sin token debe devolver 401 UNAUTHORIZED")
@@ -58,7 +89,7 @@ public class SecurityIntegrationTest {
         webTestClient
                 .mutateWith(mockJwt()
                         .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))))
-                .delete().uri("/api/workshops/deactive/1")
+                .delete().uri("/api/workshops/deactive/" + workshopId)
                 .exchange()
                 .expectStatus().isForbidden();
     }
@@ -69,9 +100,9 @@ public class SecurityIntegrationTest {
         webTestClient
                 .mutateWith(mockJwt()
                         .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                .delete().uri("/api/workshops/deactive/1")
+                .delete().uri("/api/workshops/deactive/" + workshopId)
                 .exchange()
-                .expectStatus().isOk(); // o .isNoContent()
+                .expectStatus().isOk(); // o .isNoContent();
     }
 
     @Test
