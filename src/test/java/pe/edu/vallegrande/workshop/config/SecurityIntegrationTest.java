@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pe.edu.vallegrande.workshop.model.Workshop;
 import pe.edu.vallegrande.workshop.repository.WorkshopRepository;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.LocalDate;
