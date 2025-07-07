@@ -33,7 +33,7 @@ class WorkshopControllerTest {
     private WebTestClient webTestClient;
 
     @MockBean
-    private WorkshopService workshopService;  // MockBean para el servicio
+    private WorkshopService workshopService;  
 
     private Workshop workshop;
 
