@@ -1,11 +1,9 @@
 package pe.edu.vallegrande.workshop.kafka;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,18 +50,24 @@ public class KafkaProducerServiceTest {
     }
 
     @Test
-    void testSendWorkshopEvent_ThrowsException() throws Exception {
-        // Arrange
-        WorkshopKafkaEventDto eventDto = mock(WorkshopKafkaEventDto.class);
-        when(eventDto.getId()).thenReturn(1L);
-        when(objectMapper.writeValueAsString(eventDto)).thenThrow(new RuntimeException("Serialization failed"));
+void testSendWorkshopEvent_ThrowsException() throws Exception {
+    // Arrange: usa un DTO real
+    WorkshopKafkaEventDto eventDto = new WorkshopKafkaEventDto();
+    eventDto.setId(1L);
+    eventDto.setName("Curso fallido");
 
-        kafkaProducerService = new KafkaProducerService(kafkaTemplate, objectMapper);
+    // Crea un spy del ObjectMapper que lance una excepción al serializar
+    ObjectMapper spyMapper = org.mockito.Mockito.spy(new ObjectMapper());
+    org.mockito.Mockito.doThrow(new RuntimeException("Serialization failed"))
+            .when(spyMapper).writeValueAsString(eventDto);
 
-        // Act
-        kafkaProducerService.sendWorkshopEvent(eventDto);
+    kafkaProducerService = new KafkaProducerService(kafkaTemplate, spyMapper);
 
-        // Assert
-        verify(kafkaTemplate, never()).send(anyString(), anyString(), anyString());
-    }
+    // Act
+    kafkaProducerService.sendWorkshopEvent(eventDto);
+
+    // Assert
+    verify(kafkaTemplate, never()).send(anyString(), anyString(), anyString());
+}
+
 }
