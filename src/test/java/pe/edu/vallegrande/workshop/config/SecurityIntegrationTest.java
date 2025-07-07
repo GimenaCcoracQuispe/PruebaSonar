@@ -29,116 +29,115 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 @ImportAutoConfiguration(exclude = {
-    org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration.class,
-    org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration.class
+                org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration.class,
+                org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration.class
 })
-public class SecurityIntegrationTest {
+class SecurityIntegrationTest {
 
-    @Autowired
-    private WebTestClient webTestClient;
+        @Autowired
+        private WebTestClient webTestClient;
 
-    @MockBean
-    private WorkshopRepository workshopRepository;
+        @MockBean
+        private WorkshopRepository workshopRepository;
 
-    private Long workshopId;
+        private Long workshopId;
 
-    @BeforeEach
-    void setup() {
-        this.webTestClient = this.webTestClient.mutate()
-                .responseTimeout(Duration.ofSeconds(10))
-                .build();
+        @BeforeEach
+        void setup() {
+                this.webTestClient = this.webTestClient.mutate()
+                                .responseTimeout(Duration.ofSeconds(10))
+                                .build();
 
-        Workshop w = new Workshop();
-        w.setId(1L);
-        w.setName("Taller Seguridad");
-        w.setDescription("Test Admin");
-        w.setStartDate(LocalDate.of(2025, 1, 1));
-        w.setEndDate(LocalDate.of(2025, 12, 31));
-        w.setObservation("Prueba");
-        w.setState("A");
-        w.setPersonId("1,2");
+                Workshop w = new Workshop();
+                w.setId(1L);
+                w.setName("Taller Seguridad");
+                w.setDescription("Test Admin");
+                w.setStartDate(LocalDate.of(2025, 1, 1));
+                w.setEndDate(LocalDate.of(2025, 12, 31));
+                w.setObservation("Prueba");
+                w.setState("A");
+                w.setPersonId("1,2");
 
-        // ✅ Mock: save
-        Mockito.when(workshopRepository.save(Mockito.any(Workshop.class)))
-               .thenReturn(Mono.just(w));
+                Mockito.when(workshopRepository.save(Mockito.any(Workshop.class)))
+                                .thenReturn(Mono.just(w));
 
-        // ✅ Mock: findAll (usado por /list)
-        Mockito.when(workshopRepository.findAll())
-               .thenReturn(Flux.just(w));
+                Mockito.when(workshopRepository.findAll())
+                                .thenReturn(Flux.just(w));
 
-        // ✅ Mock: findById (si tu controlador lo usa)
-        Mockito.when(workshopRepository.findById(1L))
-               .thenReturn(Mono.just(w));
+                Mockito.when(workshopRepository.findById(1L))
+                                .thenReturn(Mono.just(w));
 
-        // ✅ Mock: deactivate (si usas un método personalizado para eliminar)
-        Mockito.when(workshopRepository.deleteById(1L))
-       .thenReturn(Mono.empty());
- // 1 fila modificada
+                Mockito.when(workshopRepository.deleteById(1L))
+                                .thenReturn(Mono.empty());
 
-        workshopId = w.getId();
-    }
+                workshopId = w.getId();
+        }
 
-    @Test
-    @DisplayName("❌ GET sin token debe devolver 401 UNAUTHORIZED")
-    void testGetWithoutToken_Unauthorized() {
-        webTestClient.get()
-                .uri("/api/workshops/list")
-                .exchange()
-                .expectStatus().isUnauthorized();
-    }
+        @Test
+        @DisplayName("❌ GET sin token debe devolver 401 UNAUTHORIZED")
+        void testGetWithoutToken_Unauthorized() {
+                webTestClient.get()
+                                .uri("/api/workshops/list")
+                                .exchange()
+                                .expectStatus().isUnauthorized();
+        }
 
-    @Test
-    @DisplayName("✅ GET con rol USER debe ser permitido (200 OK)")
-    void testGetWithUserRole_Authorized() {
-        webTestClient
-            .mutateWith(mockJwt()
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))))
-            .get().uri("/api/workshops/list")
-            .exchange()
-            .expectStatus().isOk();
-    }
+        @Test
+        @DisplayName("✅ GET con rol USER debe ser permitido (200 OK)")
+        void testGetWithUserRole_Authorized() {
+                webTestClient
+                                .mutateWith(mockJwt()
+                                                .authorities(Collections.singletonList(
+                                                                new SimpleGrantedAuthority("ROLE_USER"))))
+                                .get().uri("/api/workshops/list")
+                                .exchange()
+                                .expectStatus().isOk();
+        }
 
-    @Test
-    @DisplayName("✅ GET con rol ADMIN debe ser permitido (200 OK)")
-    void testGetWithAdminRole_Authorized() {
-        webTestClient
-            .mutateWith(mockJwt()
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-            .get().uri("/api/workshops/list")
-            .exchange()
-            .expectStatus().isOk();
-    }
+        @Test
+        @DisplayName("✅ GET con rol ADMIN debe ser permitido (200 OK)")
+        void testGetWithAdminRole_Authorized() {
+                webTestClient
+                                .mutateWith(mockJwt()
+                                                .authorities(Collections.singletonList(
+                                                                new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                                .get().uri("/api/workshops/list")
+                                .exchange()
+                                .expectStatus().isOk();
+        }
 
-    @Test
-    @DisplayName("❌ DELETE con rol USER debe devolver 403 FORBIDDEN")
-    void testDeleteWithUserRole_Forbidden() {
-        webTestClient
-            .mutateWith(mockJwt()
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))))
-            .delete().uri("/api/workshops/deactive/" + workshopId)
-            .exchange()
-            .expectStatus().isForbidden();
-    }
+        @Test
+        @DisplayName("❌ DELETE con rol USER debe devolver 403 FORBIDDEN")
+        void testDeleteWithUserRole_Forbidden() {
+                webTestClient
+                                .mutateWith(mockJwt()
+                                                .authorities(Collections.singletonList(
+                                                                new SimpleGrantedAuthority("ROLE_USER"))))
+                                .delete().uri("/api/workshops/deactive/" + workshopId)
+                                .exchange()
+                                .expectStatus().isForbidden();
+        }
 
-    @Test
-    @DisplayName("✅ DELETE con rol ADMIN debe ser permitido (200 OK)")
-    void testDeleteWithAdminRole_Authorized() {
-        webTestClient
-            .mutateWith(mockJwt()
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-            .delete().uri("/api/workshops/deactive/" + workshopId)
-            .exchange()
-            .expectStatus().isOk();
-    }
+        @Test
+        @DisplayName("✅ DELETE con rol ADMIN debe ser permitido (200 OK)")
+        void testDeleteWithAdminRole_Authorized() {
+                webTestClient
+                                .mutateWith(mockJwt()
+                                                .authorities(Collections.singletonList(
+                                                                new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                                .delete().uri("/api/workshops/deactive/" + workshopId)
+                                .exchange()
+                                .expectStatus().isOk();
+        }
 
-    @Test
-    @DisplayName("❌ Token inválido debe devolver 403 FORBIDDEN")
-    void testInvalidToken_Forbidden() {
-        webTestClient
-            .mutateWith(SecurityMockServerConfigurers.mockOpaqueToken()
-                .attributes(attrs -> attrs.remove("sub")))
-            .get().uri("/api/workshops/list")
-            .exchange()
-            .expectStatus().isForbidden();
-    }
+        @Test
+        @DisplayName("❌ Token inválido debe devolver 403 FORBIDDEN")
+        void testInvalidToken_Forbidden() {
+                webTestClient
+                                .mutateWith(SecurityMockServerConfigurers.mockOpaqueToken()
+                                                .attributes(attrs -> attrs.remove("sub")))
+                                .get().uri("/api/workshops/list")
+                                .exchange()
+                                .expectStatus().isForbidden();
+        }
 }

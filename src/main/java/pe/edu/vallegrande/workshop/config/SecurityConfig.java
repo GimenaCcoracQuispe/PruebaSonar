@@ -55,8 +55,6 @@ public class SecurityConfig {
                                                 .hasRole("ADMIN")
                                                 .pathMatchers(HttpMethod.DELETE, "/api/workshops/deactive/**")
                                                 .hasRole("ADMIN")
-
-                                                // Todo lo demás requiere estar autenticado
                                                 .anyExchange().authenticated())
                                 .oauth2ResourceServer(oauth2 -> oauth2
                                                 .jwt(jwt -> jwt
