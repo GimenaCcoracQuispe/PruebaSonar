@@ -1,13 +1,14 @@
-package pe.edu.vallegrande.asistencia.repository;
+package pe.edu.vallegrande.issue.repository;
+
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-import pe.edu.vallegrande.asistencia.model.Issue;
+import pe.edu.vallegrande.issue.model.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface IssueRepository extends ReactiveCrudRepository<Issue, Long>{
+public interface IssueRepository extends ReactiveCrudRepository<Issue, Long> {
     Flux<Issue> findAllByState(String state);
 
     @Modifying

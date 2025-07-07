@@ -1,13 +1,13 @@
-package pe.edu.vallegrande.asistencia;
+package pe.edu.vallegrande.issue;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AsistenciaApplication {
+public class IssueApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AsistenciaApplication.class, args);
+		SpringApplication.run(IssueApplication.class, args);
 	}
 
 }
